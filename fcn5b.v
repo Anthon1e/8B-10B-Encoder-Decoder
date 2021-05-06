@@ -34,12 +34,13 @@ module fcn5b(
 	// It counts the number of 1s and 0s in ABCD
 	// L40 means Four 1s and No 0s 
 	wire L40, L31, L22, L13, L04; 
-	assign L40 = A & B & C & D;								// A=B=C=D=1
-	assign L04 = ~A & ~B & ~C & ~D; 						// A=B=C=D=0 
-	assign L13 = ((A^B) & ~C & ~D) || (~A & ~B & (C^D)); 	// A and B diff, C=D=0 OR A=B=0, C and D diff
-	assign L31 = ((A^B) & C & D) || (A & B & (C^D));		// A and B diff, C=D=1 OR A=B=1, C and D diff
-	assign L22 = A & B & ~C & ~D ||
-				 ~A & ~B & C & D ||							// A=B=1,C=D=0 OR A=B=0,C=D=1		
-				 (A^B) & (C^D); 							// A and B diff, C and D diff, so 2 1s and 2 0s 
+	assign L40 = A & B & C & D;                     // A=B=C=D=1
+	assign L04 = ~A & ~B & ~C & ~D; 	        // A=B=C=D=0 
+	assign L13 = ((A^B) & ~C & ~D) | 
+	             (~A & ~B & (C^D));                 // A and B diff, C=D=0 OR A=B=0, C and D diff
+	assign L31 = ((A^B) & C & D) | (A & B & (C^D)); // A and B diff, C=D=1 OR A=B=1, C and D diff
+	assign L22 = A & B & ~C & ~D |
+		     ~A & ~B & C & D |			// A=B=1,C=D=0 OR A=B=0,C=D=1		
+		     (A^B) & (C^D); 			// A and B diff, C and D diff, so 2 1s and 2 0s 
 	assign L = {L40, L31, L22, L13, L04, K}; 
 endmodule
