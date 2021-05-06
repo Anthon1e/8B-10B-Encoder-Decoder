@@ -9,8 +9,8 @@
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: The top module for 8B10B Encoder
-// 
+// Description: Top level module for 8B10B Encoder
+//              
 // Dependencies: 
 // 
 // Revision:
@@ -24,23 +24,23 @@ module Enc8B10B(
     input BYTECLK, 
     input bit_control,
     input [7:0] data_in,
-    input rd_in,
-    output bit_control_out,
-    output logic_rd_out,
     output [9:0] data_out
     );
     
     // Variable to hold values 
     wire clk = BYTECLK; 
     wire K = bit_control;
-    wire COMPL6, COMPL4;
-    wire [5:0] data_out_f5b;
-    wire [2:0] data_out_f3b;
-    wire [5:0] L;
+    wire PDL6, COMPLS6, COMPLS4;
+    wire [5:0] L;    // L
+    wire [4:0] data_buffer;  
+    wire [5:0] abcdei;
+    wire [3:0] fghj; 
     
     fcn5b   f5b(clk, K, data_in[4:0], L);
-    fcn3b   f3b(clk, K, data_in[7:5], data_out_f3b); 
-    disCtrl dis(clk, L, data_out_f3b, COMPL6, COMPL4);
-    fcn5b6b f56(L, COMPL6, data_in[4:0], data_out[5:0]);
-    fcn3b4b f34(L, COMPL4, data_in[7:5], data_out[9:6]);
+    fcn3b   f3b(clk, K, data_in[7:3], PDL6, L, data_buffer); 
+    disCtrl dis(clk, L, data_buffer, data_in[4], data_in[3], PDL6, COMPLS6, COMPLS4);
+    fcn5b6b f56(clk, data_in[4:0], L, COMPLS6, abcdei);
+    fcn3b4b f34(clk, data_buffer, COMPLS4, fghj);
+    
+    assign data_out = {abcdei[5:1], fghj[3:1], abcdei[0], fghj[0]};
 endmodule
