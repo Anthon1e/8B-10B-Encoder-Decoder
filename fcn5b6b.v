@@ -45,4 +45,5 @@ module fcn5b6b(
         i = (~E & L22) ^ (L22 & K) ^ (L04 & E) ^ (E & L40) ^ (E & L13 & ~D) ^ COMPLS6;
     end
     assign data_out = {a, b, c, d, e, i};
+    
 endmodule
