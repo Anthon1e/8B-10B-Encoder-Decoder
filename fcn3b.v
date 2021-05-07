@@ -22,6 +22,7 @@
 
 module fcn3b(
     input clk, 
+    input reset,
     input K,
     input [7:3] data_in,  
     input PDL6,
@@ -47,7 +48,7 @@ module fcn3b(
     // Flip flop to update value of S
     always @(posedge clk)
     begin
-        S = (PDL6 & L31 & D & ~E) | (NDL6 & L13 & ~D & E);
+        S = (PDL6 & L31 & D & ~E) ^ (NDL6 & L13 & ~D & E);
     end
     assign data_buffer = {S, K4, H4, G4, F4};
 endmodule
