@@ -21,12 +21,13 @@
 
 
 module disCtrl(
-    input clk,
+    input clk, 
+    input reset,
     input [5:0] L,
     input [4:0] data_buffer,
     input D, 
     input E,
-    output PDL6,
+    output reg PDL6_upd,
     output COMPLS6,
     output COMPLS4
     );
@@ -39,7 +40,7 @@ module disCtrl(
         D0 stands for D0  (current running disparity) */
     /* Disparity classification for 5B/6B */
     wire PD1S6, ND0S6, ND1S6, PD0S6;
-    assign PD1S6 = (L13 & D & E) | (~L22 & ~L31 & ~E);
+    assign PD1S6 = !((L13 & D & E) ^ (~L22 & ~L31 & ~E));
     assign ND0S6 = PD1S6;
     assign ND1S6 = (L31 & ~D & ~E) | (E & ~L22 & ~L13) | K;
     assign PD0S6 = (E & ~L22 & ~L13) | K;
@@ -52,26 +53,31 @@ module disCtrl(
     /* Control of complementation:
         NEED MORE CLARIFICATION ON THIS
     */
-    wire PDL4;
-    reg PDL6_upd, PDL4_upd; 
+    wire PDL4, PDL6;
+    reg PDL4_upd; 
     /* Upper flip-flop for running disparity of bit i */
     assign PDL6 = (PD0S6 & ~COMPLS6) |
                   (COMPLS6 & ND0S6)  |
                   (~ND0S6 & ~PD0S6 & ~PDL4_upd);    // Current running disparity for bit i
-    always @(negedge clk)
+    always @(posedge clk)
     begin
-        PDL6_upd <= PDL6; 
+        if (reset)
+            PDL6_upd <= 0;
+        else
+            PDL6_upd <= PDL6; 
     end
-    assign COMPLS4 = (ND1S4 & PDL6_upd) |           // Compare with D-1 entry disparity
-                     (~PDL6_upd & PD1S4);           // to determine the complement for 4B
+    // Compare with D-1 entry disparity to determine the complement for 4B
+    assign COMPLS4 = (ND1S4 & PDL6_upd)^(~PDL6_upd & PD1S4);
     /* Lower flip-flop for running disparity of bit j */
-    assign PDL4 = (~COMPLS4 & PD0S4) |
-                  (ND0S4 & COMPLS4)  |
-                  (~PDL6_upd & ~PD0S4 & ~ND0S4);    // Current running disparity for bit j
+                                                    // Current running disparity for bit j
+    assign PDL4 = (~COMPLS4 & PD0S4)^(ND0S4 & COMPLS4)^(~PDL6_upd & ~PD0S4 & ~ND0S4);                     
     always @(negedge clk)
     begin 
-        PDL4_upd <= PDL4; 
+        if (reset)
+            PDL4_upd <= 0;
+        else
+            PDL4_upd <= PDL4; 
     end 
-    assign COMPLS6 = (ND1S6 & PDL4_upd) |           // Compare with D-1 entry disparity
-                     (~PDL4_upd & PD1S6);           // to determine the complement for 6B
+    // Compare with D-1 entry disparity to determine the complement for 6B
+    assign COMPLS6 = (ND1S6 & PDL4_upd)^(~PDL4_upd & PD1S6);
 endmodule
