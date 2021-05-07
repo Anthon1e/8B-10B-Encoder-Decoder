@@ -25,18 +25,18 @@ module fcn3b(
     input reset,
     input K,
     input [7:3] data_in,  
-    input PDL6,
+    input PD1S6,
     input [5:0] L,
     output [4:0] data_buffer
     );
     wire F, G, H, E, D;
     assign {H, G, F, E, D} = data_in;
-    wire NDL6 = ~PDL6;
+    wire ND1S6 = ~PD1S6;
     wire L13 = L[2];
     wire L31 = L[4];
     // Buffers to hold the values of F,G,H and K 
     reg S, F4, G4, H4, K4;
-    always @(negedge clk) 
+    always @(*) 
     begin
         F4 <= F; 
         G4 <= G;
@@ -46,9 +46,9 @@ module fcn3b(
     // Bit encoding in 3B/4B Classifications
     // Redundant so obmitted here (see disCtrl function for more details) 
     // Flip flop to update value of S
-    always @(posedge clk)
+    always @(*)
     begin
-        S = (PDL6 & L31 & D & ~E) ^ (NDL6 & L13 & ~D & E);
+        S = (PD1S6 & L31 & D & ~E) ^ (ND1S6 & L13 & ~D & E);
     end
     assign data_buffer = {S, K4, H4, G4, F4};
 endmodule
