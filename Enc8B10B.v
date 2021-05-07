@@ -22,25 +22,54 @@
 
 module Enc8B10B(
     input BYTECLK, 
+    input reset,
     input bit_control,
-    input [7:0] data_in,
-    output [9:0] data_out
+    input [7:0] in,
+    output reg [9:0] out
     );
     
     // Variable to hold values 
     wire clk = BYTECLK; 
-    wire K = bit_control;
     wire PDL6, COMPLS6, COMPLS4;
     wire [5:0] L;    // L
     wire [4:0] data_buffer;  
     wire [5:0] abcdei;
     wire [3:0] fghj; 
     
-    fcn5b   f5b(clk, K, data_in[4:0], L);
-    fcn3b   f3b(clk, K, data_in[7:3], PDL6, L, data_buffer); 
-    disCtrl dis(clk, L, data_buffer, data_in[4], data_in[3], PDL6, COMPLS6, COMPLS4);
-    fcn5b6b f56(clk, data_in[4:0], L, COMPLS6, abcdei);
-    fcn3b4b f34(clk, data_buffer, COMPLS4, fghj);
+    reg [7:0] data_in;
+    reg K, rd_in, en;
+    wire next_K, rd_out;
     
-    assign data_out = {abcdei[5:1], fghj[3:1], abcdei[0], fghj[0]};
+    always @(posedge clk) 
+    begin 
+        if (reset) begin
+            K <= 0;
+        end
+        else begin
+            K <= bit_control;
+        end
+    end
+    
+    always @(negedge clk) 
+    begin 
+        if (reset) begin
+            data_in <= 8'b0;
+            rd_in <= 0;
+        end
+        else begin
+            rd_in <= rd_out;
+            data_in <= in;
+        end
+    end
+    
+    fcn5b   f5b(clk, reset, K, data_in[4:0], L);
+    fcn3b   f3b(clk, reset, K, data_in[7:3], PDL6, L, data_buffer); 
+    disCtrl dis(clk, reset, L, data_buffer, data_in[4], data_in[3], rd_in, COMPLS6, COMPLS4, rd_out);
+    fcn5b6b f56(clk, reset, data_in[4:0], L, COMPLS6, abcdei);
+    fcn3b4b f34(clk, reset, data_buffer, COMPLS4, fghj);
+    
+    always @(negedge clk)
+    begin
+        out = {abcdei[5:0], fghj[3:0]}; // Encoded messages
+    end
 endmodule
