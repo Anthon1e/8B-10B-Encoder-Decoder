@@ -9,9 +9,8 @@
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: Actual transformation of 5 input bits ABCDE into
-//                  the 6 abcdei output bits according to given rules
-//              Figure 7 in Encoder diagram 
+// Description: 3B/4B classification or the S function 
+//              Figure 4 in Encoder diagram
 // Dependencies: 
 // 
 // Revision:
@@ -21,28 +20,35 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module fcn5b6b(
-    input clk,  
+module fcn3b(
+    input clk, 
     input reset,
-    input [4:0] data_in,
+    input K,
+    input [7:3] data_in,  
+    input PDL6,
     input [5:0] L,
-    input COMPLS6,
-    output [5:0] data_out
+    output [4:0] data_buffer
     );
-    wire A, B, C, D, E;
-    assign {E, D, C, B, A} = data_in;
-    wire L40, L31, L22, L13, L04, K;
-    assign {L40, L31, L22, L13, L04, K} = L;
-    reg a, b, c, d, e, i;
-    /* Transformation of 5 input bits ABCDE into the 6 abcdei */
+    wire F, G, H, E, D;
+    assign {H, G, F, E, D} = data_in;
+    wire NDL6 = ~PDL6;
+    wire L13 = L[2];
+    wire L31 = L[4];
+    // Buffers to hold the values of F,G,H and K 
+    reg S, F4, G4, H4, K4;
+    always @(negedge clk) 
+    begin
+        F4 <= F; 
+        G4 <= G;
+        H4 <= H;
+        K4 <= K;  
+    end 
+    // Bit encoding in 3B/4B Classifications
+    // Redundant so obmitted here (see disCtrl function for more details) 
+    // Flip flop to update value of S
     always @(posedge clk)
-    begin 
-        a = A ^ COMPLS6; 
-        b = ((~L40 & B) | L04) ^ COMPLS6;
-        c = (L04 | C) ^ (L13 & D & E) ^ COMPLS6; 
-        d = (D & ~L40) ^ COMPLS6;
-        e = (~(L13 & D & E) & E) ^ (~E & L13) ^ COMPLS6; 
-        i = (~E & L22) ^ (L22 & K) ^ (L04 & E) ^ (E & L40) ^ (E & L13 & ~D) ^ COMPLS6;
+    begin
+        S = (PDL6 & L31 & D & ~E) ^ (NDL6 & L13 & ~D & E);
     end
-    assign data_out = {a, b, c, d, e, i};
+    assign data_buffer = {S, K4, H4, G4, F4};
 endmodule
