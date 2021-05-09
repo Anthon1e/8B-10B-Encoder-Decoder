@@ -1,0 +1,14 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/Enc8B10B.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module Enc8B10B
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/disCtrl.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module disCtrl
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/fcn3b.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module fcn3b
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/fcn3b4b.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module fcn3b4b
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/fcn5b.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module fcn5b
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/fcn5b6b.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module fcn5b6b
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sim_1/new/Enc8B10B_tb.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module Enc8B10B_tb

@@ -22,6 +22,7 @@
 
 module fcn5b(
     input clk, 
+    input reset,
     input K,
     input [4:0] data_in,
     output [5:0] L

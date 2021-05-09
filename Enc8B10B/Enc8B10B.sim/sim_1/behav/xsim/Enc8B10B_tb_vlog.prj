@@ -1,0 +1,15 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  \
+"../../../../Enc8B10B.srcs/sources_1/new/Enc8B10B.v" \
+"../../../../Enc8B10B.srcs/sources_1/new/disCtrl.v" \
+"../../../../Enc8B10B.srcs/sources_1/new/fcn3b.v" \
+"../../../../Enc8B10B.srcs/sources_1/new/fcn3b4b.v" \
+"../../../../Enc8B10B.srcs/sources_1/new/fcn5b.v" \
+"../../../../Enc8B10B.srcs/sources_1/new/fcn5b6b.v" \
+"../../../../Enc8B10B.srcs/sim_1/new/Enc8B10B_tb.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

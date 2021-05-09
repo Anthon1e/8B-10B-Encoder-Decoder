@@ -1,0 +1,12 @@
+0.6
+2019.1
+May 24 2019
+15:06:07
+D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.sim/sim_1/behav/xsim/glbl.v,1558713910,verilog,,,,glbl,,,,,,,,
+D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sim_1/new/Enc8B10B_tb.v,1620530940,verilog,,,,Enc8B10B_tb,,,,,,,,
+D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/Enc8B10B.v,1620530861,verilog,,D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/disCtrl.v,,Enc8B10B,,,,,,,,
+D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/disCtrl.v,1620530167,verilog,,D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/fcn3b.v,,disCtrl,,,,,,,,
+D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/fcn3b.v,1620530167,verilog,,D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/fcn3b4b.v,,fcn3b,,,,,,,,
+D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/fcn3b4b.v,1620530167,verilog,,D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/fcn5b.v,,fcn3b4b,,,,,,,,
+D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/fcn5b.v,1620531071,verilog,,D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/fcn5b6b.v,,fcn5b,,,,,,,,
+D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sources_1/new/fcn5b6b.v,1620530167,verilog,,D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sim_1/new/Enc8B10B_tb.v,,fcn5b6b,,,,,,,,

@@ -1,0 +1,4 @@
+Vivado Simulator 2019.1
+Time resolution is 1 ps
+INTERFACE OK
+$stop called at time : 18 ns : File "D:/Personal_Project/8B10B-Encoding/Enc8B10B/Enc8B10B.srcs/sim_1/new/Enc8B10B_tb.v" Line 60
