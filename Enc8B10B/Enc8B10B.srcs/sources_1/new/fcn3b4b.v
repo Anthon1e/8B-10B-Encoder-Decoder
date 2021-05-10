@@ -32,12 +32,12 @@ module fcn3b4b(
     assign {S, K4, H4, G4, F4} = data_buffer;
     reg f, g, h, j;
     /* Transformation of 3 input bits FGH into the 4 fghj */
-    always @(negedge clk)
+    always @(*)
     begin
-        f = F4 & ((S & F4 & G4 & H4) ^ (K4 & F4 & G4 & H4)) ^ COMPLS4; 
+        f = (F4 & ~((S & F4 & G4 & H4) ^ (K4 & F4 & G4 & H4))) ^ COMPLS4; 
         g = (G4 | (~F4 & ~G4 & ~H4)) ^ COMPLS4;
         h = H4 ^ COMPLS4; 
-        j = ((S & F4 & G4 & H4) | (F4 & G4 & H4 & K4) | ((F4 ^ G4) & ~H4)) ^ COMPLS4;
+        j = (( (S & F4 & G4 & H4) ^ (F4 & G4 & H4 & K4) ) | ((F4 ^ G4) & ~H4)) ^ COMPLS4;
     end
     assign data_out = {f, g, h, j};
 endmodule
