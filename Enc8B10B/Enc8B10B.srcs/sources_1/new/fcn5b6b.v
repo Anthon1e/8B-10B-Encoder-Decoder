@@ -35,7 +35,7 @@ module fcn5b6b(
     assign {L40, L31, L22, L13, L04, K} = L;
     reg a, b, c, d, e, i;
     /* Transformation of 5 input bits ABCDE into the 6 abcdei */
-    always @(posedge clk)
+    always @(*)
     begin 
         a = A ^ COMPLS6; 
         b = ((~L40 & B) | L04) ^ COMPLS6;
