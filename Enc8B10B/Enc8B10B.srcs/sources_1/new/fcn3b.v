@@ -24,17 +24,17 @@ module fcn3b(
     input clk, 
     input reset,
     input K,
-    input [7:3] data_in,  
-    input PD1S6,
+    input [4:0] data_in,  
+    input rd_in_s4,
     input [5:0] L,
     output [4:0] data_buffer
     );
     wire F, G, H, E, D;
     assign {H, G, F, E, D} = data_in;
-    wire ND1S6 = ~PD1S6;
     wire L13 = L[2];
     wire L31 = L[4];
     // Buffers to hold the values of F,G,H and K 
+    // Honestly do not know why we need this code
     reg S, F4, G4, H4, K4;
     always @(*) 
     begin
@@ -48,7 +48,7 @@ module fcn3b(
     // Flip flop to update value of S
     always @(*)
     begin
-        S = (PD1S6 & L31 & D & ~E) ^ (ND1S6 & L13 & ~D & E);
+        S <= (rd_in_s4 & L31 & D & ~E) ^ (~rd_in_s4 & L13 & ~D & E);
     end
     assign data_buffer = {S, K4, H4, G4, F4};
 endmodule
