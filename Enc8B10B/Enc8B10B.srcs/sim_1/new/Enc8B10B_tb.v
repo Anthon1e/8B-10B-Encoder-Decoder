@@ -41,12 +41,12 @@ module Enc8B10B_tb();
     
     initial begin
         // Set up for the rise of clock every 2 seconds
-        clock = 1'b0;
+        clock = 1'b1;
         #1;
         forever begin
-            clock = 1'b1;
-            #1;
             clock = 1'b0;
+            #1;
+            clock = 1'b1;
             #1;
         end
     end
@@ -62,7 +62,7 @@ module Enc8B10B_tb();
         #2;
         
         reset = 1;
-        #2; 
+        #4; 
         
         for (i = 0; i < 269; i = i + 1) begin
             /* Reset stage */
@@ -71,7 +71,7 @@ module Enc8B10B_tb();
                 K = 0;
                 reset = 0;
                 #2; 
-            /* Begin with all 256 cases */ 
+            /* Begin with all 268 cases */ 
             end else begin
                 /* Normal characters check */
                 if (i < 256)        in = in + 1;
@@ -92,26 +92,26 @@ module Enc8B10B_tb();
                 /* For vector expected output file: check disparity to decide whether to pick RD- or RD+ */
                 // We are looking at i-1 for rd_val since there is 1 cycle delay until the results come out
                 // We are looking at i-2 for change_rd since it depends on previous values
-                if (i == 1) begin                   // First case, take RD-
-                    ex_out = neg_rd_val[i-1];   
+                if (i == 0 || i == 1) begin                   // First case, take RD-
+                    ex_out = neg_rd_val[0];   
                     side = 0;                                   end
-                if (change_rd[i-2] == 1) begin      // If current RD is #, then take value from the other RD
+                if (change_rd[i-3] == 1) begin      // If current RD is #, then take value from the other RD
                     if (side == 0) begin
-                        ex_out = pos_rd_val[i-1];
+                        ex_out = pos_rd_val[i-2];
                         side = 1;                               end
                     else begin
-                        ex_out = neg_rd_val[i-1];      
+                        ex_out = neg_rd_val[i-2];      
                         side = 0;                           end end
-                if (change_rd[i-2] == 0) begin      // If current RD is =, then take value from same RD
-                    if (side == 1)  ex_out = pos_rd_val[i-1];
-                    else            ex_out = neg_rd_val[i-1];   end
+                if (change_rd[i-3] == 0) begin      // If current RD is =, then take value from same RD
+                    if (side == 1)  ex_out = pos_rd_val[i-2];
+                    else            ex_out = neg_rd_val[i-2];   end
                 
                 /* Check errors */ 
                 if (out !== ex_out) begin 
-                    $display("ASSERTION FAILED: Case %d, Expected: %b, Got: %b", i-1, ex_out, out); 
+                    $display("ASSERTION FAILED: Case %d, Expected: %b, Got: %b", i-2, ex_out, out); 
                     err = 1; 
                 end
-                else $display("Case %d is Correct, Output is %b", i-1, out);
+                else $display("Case %d is Correct, Output is %b", i-2, out);
                
             end
         end
