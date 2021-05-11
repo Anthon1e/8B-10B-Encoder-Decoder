@@ -1,5 +1,8 @@
 Main article: 
-https://opencores.org/websvn/filedetails?repname=1000base-x&path=%2F1000base-x%2Ftrunk%2Fdoc%2F01-581v1.pdf
+1. https://opencores.org/websvn/filedetails?repname=1000base-x&path=%2F1000base-x%2Ftrunk%2Fdoc%2F01-581v1.pdf
+2. Lattice Semiconductor Corporation on "8B/10B Encoder/Decoder"
+3. Actel on "Implementing an 8b/10b Encoder/Decoder for Gigabit Ethernet in the Actel SX FPGA Family"
 
 Useful articles: 
-https://www.mediafire.com/folder/78x822r9aa4cg/8B10B (2 files here) 
+1. https://www.mediafire.com/folder/78x822r9aa4cg/8B10B (2 files here) 
+2. https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/ds/dsed8b10b.pdf
