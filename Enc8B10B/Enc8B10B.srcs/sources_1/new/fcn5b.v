@@ -22,10 +22,8 @@
 
 module fcn5b(
     input clk, 
-    input reset,
-    input K,
     input [4:0] data_in,
-    output [5:0] L
+    output [4:0] L
 	);
 	// A is the lowest order bit
 	wire A,B,C,D,E;
@@ -43,5 +41,5 @@ module fcn5b(
 	assign L22 = A & B & ~C & ~D |
 		         ~A & ~B & C & D |			           // A=B=1,C=D=0 OR A=B=0,C=D=1		
 		         (A^B) & (C^D);                        // A,B diff, C,D diff, so 2 1s and 2 0s 
-	assign L = {L40, L31, L22, L13, L04, K}; 
+	assign L = {L40, L31, L22, L13, L04}; 
 endmodule
