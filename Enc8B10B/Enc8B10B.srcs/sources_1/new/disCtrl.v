@@ -20,23 +20,27 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module disCtrl(
-    input clk, 
+module disCtrl( 
+    input clk,
     input reset,
-    input [5:0] L,
-    input [4:0] data_buffer,
-    input D, 
-    input E,
+    input K,
+    input [4:0] L,
+    input S,
+    input [7:0] data_in,
     input rd_in,
-    output reg rd_in_s4,
+    output reg [7:0] saved_data_in,
+    output reg [4:0] saved_L,
+    output reg saved_K,
+    output rd_in_s4,
     output reg COMPLS6,
     output reg COMPLS4,
-    output reg rd_out
+    output rd_out
     );
-    wire L40, L31, L22, L13, L04, K, K4, F4, G4, H4, S;
-    assign {S, K4, H4, G4, F4} = data_buffer;
-    assign {L40, L31, L22, L13, L04, K} = L;
-    /* Disparity clarificat ion:-
+    wire L40, L31, L22, L13, L04;
+    wire A, B, C, D, E, F, G, H;
+    assign {L40, L31, L22, L13, L04} = L;
+    assign {H, G, F, E, D, C, B, A} = data_in;
+    /* Disparity clarification:
         P,N,S stands for Positive, Negative, Sender
         D1 stands for D-1 (entry running disparity)
         D0 stands for D0  (current running disparity) */
@@ -51,36 +55,43 @@ module disCtrl(
     /* Disparity classification for 3B/4B */  
     // If either PD1S5 or ND1S4 is set, then RD4 is changed
     wire ND1S4, ND0S4, PD1S4, PD0S4, RD4; 
-    assign ND1S4 = F4 & G4; 
-    assign ND0S4 = ~F4 & ~G4; 
-    assign PD1S4 = ND0S4 | ((F4^G4) & K4);
-    assign PD0S4 = F4 & G4 & H4;
+    assign ND1S4 = F & G; 
+    assign ND0S4 = ~F & ~G; 
+    assign PD1S4 = ND0S4 | ((F ^ G) & K);
+    assign PD0S4 = F & G & H;
     assign RD4 = (PD0S4 | ND0S4);
-    // Assign rd_out for the next input
-    reg rd_cur;
-    always @(*)
-    begin 
-        rd_cur = RD6 ^ RD4;         // Running disparity of current input
-        rd_out = rd_cur ^ rd_in;    // Use running disparity of current input to determine if we
-                                    //  need to change entry running disparity of the next input.
-    end
+    
     /* Control of complementation:
         The complement is set if rd_in's sign does not 
         matched with D1S6 and D1S4 sign                 */
-    // Disparity of D0S6 is based on the entry running disparity
-    // Complement is set when PD1S6 is 1 (expect positive), but rd_in is 0(-) 
-    //                     OR ND1S6 is 1 (expect negative), but rd_in is 1(+)
-    always @(*)
+    always @(posedge clk)
     begin 
-        COMPLS6 <= (PD1S6 & ~rd_in) | (ND1S6 & rd_in);
+        if (reset) begin 
+           {COMPLS6, COMPLS4} = 3'b100;
+           saved_data_in = 8'b0; 
+           saved_L = 0;
+           saved_K = 0;
+        end else begin
+            // Disparity of D0S6 is based on the entry running disparity
+            // Complement is set when PD1S6 is 1 (expect positive), but rd_in is 0(-) 
+            //                     OR ND1S6 is 1 (expect negative), but rd_in is 1(+)
+            COMPLS6 <= (PD1S6 & ~rd_in) | (ND1S6 & rd_in);
+            // PD1S4 is same, but here, the entry disparity 
+            //  will be the out disparity of fcn 5B 
+            // Complement is set when PD1S4 is 1 (expect positive), but rd_in is 0(-)
+            //                     OR ND1S4 is 1 (expect negative), but rd_in is 1(+)
+            COMPLS4 <= ((PD1S4 & ~rd_in_s4) | (ND1S4 & rd_in_s4));
+            saved_data_in <= data_in;
+            saved_L <= L; 
+            saved_K <= K;
+        end
     end
-    // PD1S4 is same, but here, the entry disparity 
-    //  will be the out disparity of fcn 5B 
-    // Complement is set when PD1S4 is 1 (expect positive), but rd_in is 0(-)
-    //                     OR ND1S4 is 1 (expect negative), but rd_in is 1(+)
-    always @(*)
-    begin
-        rd_in_s4 = RD6 ^ rd_in;
-        COMPLS4 = ((PD1S4 & ~rd_in_s4) | (ND1S4 & rd_in_s4));
-    end
+    
+    /* Assign rd_out for the next input */
+    wire rd_cur;
+    assign rd_cur = RD6 ^ RD4;         // Running disparity of current input
+    assign rd_out = rd_cur ^ rd_in;    // Use running disparity of current input to determine if we
+                                //  need to change entry running disparity of the next input.
+    assign rd_in_s4 = RD6 ^ rd_in;
+
 endmodule
