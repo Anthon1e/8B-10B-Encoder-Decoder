@@ -59,7 +59,7 @@ module Enc8B10B_tb();
             change_rd[i] = memory[i*3+2];
         end
         err = 0; 
-        #2;
+        #120;
         
         reset = 1;
         #4; 
