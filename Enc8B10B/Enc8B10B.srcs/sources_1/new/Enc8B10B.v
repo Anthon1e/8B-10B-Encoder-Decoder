@@ -46,7 +46,7 @@ module Enc8B10B(
     fcn5b6b f56(clk, reset, saved_data_in[4:0], saved_L, saved_K, COMPLS6, abcdei);
     fcn3b4b f34(clk, reset, saved_data_in[7:5], S, saved_K, COMPLS4, fghj);
     
-    always @(posedge clk, posedge reset)
+    always @(posedge clk)
     begin
         if (reset) begin 
             K <= 0;
