@@ -27,6 +27,9 @@ module Dec8B10B_tb();
     wire rdispout, disp_err, code_err, k_out;
 
     // Useful for error checking
+    integer i;
+    integer valid_count;
+    integer invalid_count;
     reg err;
     
     Dec8B10B DUT (clock, reset, in, rdispout, disp_err, code_err, k_out, out);
@@ -47,44 +50,32 @@ module Dec8B10B_tb();
         err = 0;
         #2; 
         
-        reset = 1;
-        in = 10'b011000_1010; 
-        #5; 
-        
-        reset = 0; 
+        reset = 1; 
         #2; 
         
-        in = 10'b100101_1011;
-        #2; 
-        if (out !== 8'b10100000) begin 
-            $display("ASSERTION FAILED: Case 1, Expected: 10100000, Got: %b", out); 
-            err = 1; 
+        for (i = 0; i < 1024; i = i + 1) begin
+            /* Reset stage */
+            if (reset == 1) begin
+                in = 0; 
+                reset = 0;
+                invalid_count = 0;
+                valid_count = 0;
+                #2; 
+            /* Begin with all 268 cases */ 
+            end else begin
+                if (code_err == 1) begin 
+                    invalid_count <= invalid_count + 1; 
+                    $display("Invalid %d", in); end
+                if (code_err == 0) valid_count <= valid_count + 1;
+                
+                in = in + 1;
+                #2;
+            end
         end
         
-        in = 10'b001100_1011;
-        #2; 
-        if (out !== 8'b00001001) begin 
-            $display("ASSERTION FAILED: Case 2, Expected: 00001001, Got: %b", out); 
-            err = 1; 
-        end
-        
-        in = 10'b100100_1001;
-        #2; 
-        if (out !== 8'b00011000) begin 
-            $display("ASSERTION FAILED: Case 3, Expected: 00011000, Got: %b", out); 
-            err = 1; 
-        end     
-        
-        in = 10'b000011_1001;
-        #2; 
-        if (out !== 8'b00110000) begin 
-            $display("ASSERTION FAILED: Case 4, Expected: 00110000, Got: %b", out); 
-            err = 1; 
-        end
-        
-        in = 10'b110000_1101;
-        #4;
-        
+        if (code_err == 1)  invalid_count = invalid_count + 1; 
+        if (code_err == 0)  valid_count = valid_count + 1;
+        #2;
         if (~err) $display("INTERFACE OK");
         $stop; 
     end
