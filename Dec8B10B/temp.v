@@ -32,12 +32,13 @@ module fcn6b(
     
     assign P13 = ((a^b) & ~c & ~d) | 
                  (~a & ~b & (c^d)) ;                // a and b diff, c=d=0 OR a=b=0, c and d diff
-    assign P31 = ((a^b) & c & c) | (a & b & (c^d)); // a and b diff, c=d=1 OR a=b=1, c and d diff 
-    assign P22 = a & b & ~c & ~d |
-                 c & d & ~a & ~b |                  // a=b=1, c=d=0 OR a=b=0, c=d=1
-                 (a^b) & (c^d) ;                    // a,b diff, c,d diff, so 2 1s and 2 0s         
+    assign P31 = ((a^b) & c & d) | (a & b & (c^d)); // a and b diff, c=d=1 OR a=b=1, c and d diff 
+    assign P22 = (a & b & ~c & ~d) |
+                 (c & d & ~a & ~b) |                  // a=b=1, c=d=0 OR a=b=0, c=d=1
+                 ((a^b) & (c^d)) ;                    // a,b diff, c,d diff, so 2 1s and 2 0s         
      assign P = {P13, P22, P31};
 endmodule
+
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -76,20 +77,20 @@ module fcn6b5b(
     wire P13, P22, P31; 
     assign {P13, P22, P31} = P;
     wire A, B, C, D, E;
-    
+        
     assign A = a ^ ((P22 & ~b & ~c & ~(e^i))|
                     (P31 & i)               |
                     (P13 & d & e & i)       |
-                    (P22 & a & c & ~(e^i))  |
+                    (P22 & ~a & ~c & ~(e^i))|
                     (P13 & ~e)              |
                     (a & b & e & i)         |
                     (~c & ~d & ~e & ~i));
     assign B = b ^ (((a & b & e & i) | ~(c | d | e | i) | (P31 & i))
                  ^ ((P22 & a & c & ~(e ^ i)) | (P13 & ~e))
-                 ^ ((P31 & i) | (P22 & b & c & ~(e ^ i)) | (P22 & a & c & ~(e ^ i))));
-    assign C = c ^ (((P31 & i) | (P22 & b & c & ~(e ^ i)) | (P22 & a & c & ~(e ^ i)))
-                 ^ ((P22 & ~a & ~c & ~(e ^ i)) | (P13 & ~e))
-                 ^ ((P13 & ~e) | ~(c | d | e | i) | ~(a | b | e | i)));
+                 ^ ((P22 & b & c & ~(e ^ i)) | (P13 & d & e & i)));
+    assign C = c ^ (((P31 & i) | (P22 & b & c & ~(e ^ i)) | (P13 & d & e & i))
+                 | ((P22 & ~a & ~c & ~(e ^ i)) | (P13 & ~e))
+                 | ((P13 & ~e) | ~(c | d | e | i) | ~(a | b | e | i)));
     assign D = d ^ (((a & b & e & i) | ~(c | d | e | i) | (P31 & i))
                  ^ ((P22 & a & c & ~(e ^ i)) | (P13 & ~e))
                  ^ ((P13 & d & e & i) | (P22 & ~b & ~c & ~(e ^ i))));
@@ -98,6 +99,7 @@ module fcn6b5b(
                  ^ ((P13 & d & e & i) | (P22 & ~b & ~c & ~(e ^ i))));
     assign EDCBA = {E, D, C, B, A};
 endmodule
+
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -150,6 +152,7 @@ module fcn4b3b(
     assign KHGF = {K, H, G, F};
 endmodule
 
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
@@ -180,6 +183,7 @@ module disCtrl(
     input [9:0] data_in,
     input rd_in,
     input [2:0] P,
+    output [3:0] D,
     output rd_out,
     output rd_error
     );
@@ -219,7 +223,9 @@ module disCtrl(
     assign rd_cur = RD6 ^ RD4;          // Running disparity of current input
     assign rd_out = rd_cur ^ rd_in;     // Use running disparity of current input to determine if we
                                         //  need to change entry running disparity of the next input.
+    assign D = {PD0S6, ND0S6, PD0S4, ND0S4};
 endmodule
+
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -250,28 +256,47 @@ module inCheck(
     input reset,
     input [9:0] data_in,
     input [2:0] P,
+    input [3:0] D,
     output in_error
     );
     
     wire a, b, c, d, e, i, f, g, h, j;
     assign {a, b, c, d, e, i, f, g, h, j} = data_in;
-    wire P13, P22, P31; 
+    wire P13, P22, P31, PD0S6, ND0S6, PD0S4, ND0S4; 
     assign {P13, P22, P31} = P;
+    assign {PD0S6, ND0S6, PD0S4, ND0S4} = D;
     
-    assign in_error = (a & b & c & d)                                   | // a=b=c=d=1
-                      (~a & ~b & ~c & ~d)                               | // a=b=c=d=0
-                      (P13 & ~e & ~i)                                   | 
-                      (P31 & e & i)                                     |
-                      (f & g & h & j)                                   | // f=g=h=j=1
-                      (~f & ~g & ~h & ~j)                               | // f=g=h=j=0
-                      (e & i & f & g & h)                               | // e=i=f=g=h=1
-                      (~e & ~i & ~f & ~g & ~h)                          | // e=i=f=g=h=0
-                      (i & ~e & ~g & ~h & ~j)                           | // i=1,e=g=h=j=0
-                      (~i & e & g & h & j)                              | // i=0,e=g=h=j=1
-                      ((e & i & ~g & ~h & ~j) & ((c ^ d) | (d ^ e)))    |
+    assign in_error = // These cover all +6, +4 disparity cases in 6B/5B
+                      (a & b & c & d)                                   | 
+                      (~a & ~b & ~c & ~d)                               | 
+                      (P13 & ~e & ~i)                                   |  
+                      (P31 & e & i)                                     | 
+                      // These cover all +4 disparity cases in 4B/3B
+                      (f & g & h & j)                                   | 
+                      (~f & ~g & ~h & ~j)                               | 
+                      // These cover all cases of run-length 5
+                      (e & i & f & g & h)                               | 
+                      (~e & ~i & ~f & ~g & ~h)                          | 
+                      (d & e & i & f & g)                               |
+                      (~d & ~e & ~i & ~f & ~g)                          |  
+                      // These cover those look like special character but are not
+                      (~c & ~d & ~e & ~i & ~f & g & h & ~j)             |
+                      (~c & ~d & ~e & ~i & ~f & g & ~h & j)             |
+                      (~c & ~d & ~e & ~i & ~f & g & h & j)              |
+                      (c & d & e & i & f & ~g & ~h & j)                 |
+                      (c & d & e & i & f & ~g & h & ~j)                 |
+                      (c & d & e & i & f & ~g & ~h & ~j)                |
+                      // These cover all anti-case of run-length 5
+                      (i & ~e & ~g & ~h & ~j)                           | 
+                      (~i & e & g & h & j)                              | 
+                      // Do not know why but it is what it is 
+                      ((e & i & ~g & ~h & ~j) & ((c ^ d) | (d ^ e)))    |   
                       ((~e & ~i & g & h & j) & ((c ^ d) | (d ^ e)))     |
                       (~P31 & e & ~i & ~g & ~h & ~j)                    |
-                      (~P13 & ~e & i & g & h & j) ;
+                      (~P13 & ~e & i & g & h & j)                       |
+                      // These cover all cases +4 or -4 total disparity
+                      (PD0S6 & PD0S4) | (ND0S6 & ND0S4) ;
 endmodule   
+
 
 
