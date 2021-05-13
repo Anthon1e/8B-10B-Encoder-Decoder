@@ -34,7 +34,7 @@ module Dec8B10B(
     // Variable to hold values 
     wire clk = BYTECLK; 
     wire [4:0] EDCBA;
-    wire [3:0] KHGF;
+    wire [3:0] KHGF, D;
     wire [2:0] P;
     wire rd_out, rd_error, in_error;
     
@@ -44,8 +44,8 @@ module Dec8B10B(
     fcn6b   f6b(clk, reset, data_in[9:4], P);
     fcn6b5b f65(clk, reset, data_in[9:4], P, EDCBA);
     fcn4b3b f43(clk, reset, data_in[7:0], P, KHGF);
-    disCtrl dis(clk, reset, data_in, rd_in, P, rd_out, rd_error);
-    inCheck err(clk, reset, data_in, P, in_error); 
+    disCtrl dis(clk, reset, data_in, rd_in, P, D, rd_out, rd_error);
+    inCheck err(clk, reset, data_in, P, D, in_error); 
     
     always @(posedge clk)
     begin
