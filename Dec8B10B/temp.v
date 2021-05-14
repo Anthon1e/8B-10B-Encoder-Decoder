@@ -274,21 +274,22 @@ module inCheck(
                       // These cover all +4 disparity cases in 4B/3B
                       (f & g & h & j)                                   | 
                       (~f & ~g & ~h & ~j)                               | 
+                      // These cover all cases of run-length 6 (D.7 and D.x.3)
+                      (a & b & c & ~d & ~e & ~i & ND0S4)                |
+                      (~a & ~b & ~c & d & e & i & PD0S4)                |
+                      (f & g & ~h & ~j & PD0S6)                         |
+                      (~f & ~g & h & j & ND0S6)                         |
                       // These cover all cases of run-length 5
                       (e & i & f & g & h)                               | 
                       (~e & ~i & ~f & ~g & ~h)                          | 
                       (d & e & i & f & g)                               |
                       (~d & ~e & ~i & ~f & ~g)                          |  
-                      // These cover those look like special character but are not
-                      (~c & ~d & ~e & ~i & ~f & g & h & ~j)             |
-                      (~c & ~d & ~e & ~i & ~f & g & ~h & j)             |
-                      (~c & ~d & ~e & ~i & ~f & g & h & j)              |
-                      (c & d & e & i & f & ~g & ~h & j)                 |
-                      (c & d & e & i & f & ~g & h & ~j)                 |
-                      (c & d & e & i & f & ~g & ~h & ~j)                |
                       // These cover all anti-case of run-length 5
                       (i & ~e & ~g & ~h & ~j)                           | 
                       (~i & e & g & h & j)                              | 
+                      // These are the 2 samples that are not covered by equations
+                      (~a & ~b & c & d & e & i & ~f & ~g & ~h & j)      |
+                      (a & b & ~c & ~d & ~e & ~i & f & g & h & ~j)      |
                       // Do not know why but it is what it is 
                       ((e & i & ~g & ~h & ~j) & ((c ^ d) | (d ^ e)))    |   
                       ((~e & ~i & g & h & j) & ((c ^ d) | (d ^ e)))     |
@@ -297,6 +298,7 @@ module inCheck(
                       // These cover all cases +4 or -4 total disparity
                       (PD0S6 & PD0S4) | (ND0S6 & ND0S4) ;
 endmodule   
+
 
 
 
