@@ -39,7 +39,6 @@ module fcn6b(
      assign P = {P13, P22, P31};
 endmodule
 
-
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
@@ -76,30 +75,33 @@ module fcn6b5b(
     assign {a, b, c, d, e, i} = data_in;
     wire P13, P22, P31; 
     assign {P13, P22, P31} = P;
-    wire A, B, C, D, E;
-        
-    assign A = a ^ ((P22 & ~b & ~c & ~(e^i))|
-                    (P31 & i)               |
-                    (P13 & d & e & i)       |
-                    (P22 & ~a & ~c & ~(e^i))|
-                    (P13 & ~e)              |
-                    (a & b & e & i)         |
-                    (~c & ~d & ~e & ~i));
-    assign B = b ^ (((a & b & e & i) | ~(c | d | e | i) | (P31 & i))
-                 ^ ((P22 & a & c & ~(e ^ i)) | (P13 & ~e))
-                 ^ ((P22 & b & c & ~(e ^ i)) | (P13 & d & e & i)));
-    assign C = c ^ (((P31 & i) | (P22 & b & c & ~(e ^ i)) | (P13 & d & e & i))
-                 | ((P22 & ~a & ~c & ~(e ^ i)) | (P13 & ~e))
-                 | ((P13 & ~e) | ~(c | d | e | i) | ~(a | b | e | i)));
-    assign D = d ^ (((a & b & e & i) | ~(c | d | e | i) | (P31 & i))
-                 ^ ((P22 & a & c & ~(e ^ i)) | (P13 & ~e))
-                 ^ ((P13 & d & e & i) | (P22 & ~b & ~c & ~(e ^ i))));
-    assign E = e ^ (((P22 & ~a & ~c & ~(e ^ i)) | (P13 & ~i))
-                 ^ ((P13 & ~e) | ~(c | d | e | i) | ~(a | b | e | i))
-                 ^ ((P13 & d & e & i) | (P22 & ~b & ~c & ~(e ^ i))));
+    reg A, B, C, D, E;
+    
+    always @(posedge clk)
+    begin
+        A = a ^ ((P22 & ~b & ~c & ~(e^i)) |
+                (P31 & i)               |
+                (P13 & d & e & i)       |
+                (P22 & ~a & ~c & ~(e^i))|
+                (P13 & ~e)              |
+                (a & b & e & i)         |
+                (~c & ~d & ~e & ~i));
+        B = b ^ (((a & b & e & i) | ~(c | d | e | i) | (P31 & i))
+              ^ ((P22 & a & c & ~(e ^ i)) | (P13 & ~e))
+              ^ ((P22 & b & c & ~(e ^ i)) | (P13 & d & e & i)));
+        C = c ^ (((P31 & i) | (P22 & b & c & ~(e ^ i)) | (P13 & d & e & i))
+              | ((P22 & ~a & ~c & ~(e ^ i)) | (P13 & ~e))
+              | ((P13 & ~e) | ~(c | d | e | i) | ~(a | b | e | i)));
+        D = d ^ (((a & b & e & i) | ~(c | d | e | i) | (P31 & i))
+              ^ ((P22 & a & c & ~(e ^ i)) | (P13 & ~e))
+              ^ ((P13 & d & e & i) | (P22 & ~b & ~c & ~(e ^ i))));
+        E = e ^ (((P22 & ~a & ~c & ~(e ^ i)) | (P13 & ~i))
+              ^ ((P13 & ~e) | ~(c | d | e | i) | ~(a | b | e | i))
+              ^ ((P13 & d & e & i) | (P22 & ~b & ~c & ~(e ^ i))));
+    end
+                 
     assign EDCBA = {E, D, C, B, A};
 endmodule
-
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -137,21 +139,22 @@ module fcn4b3b(
     assign {c, d, e, i, f, g, h, j} = data_in;
     wire P13, P22, P31; 
     assign {P13, P22, P31} = P;
-    wire K, F, G, H;
+    reg K, F, G, H;
     
-    assign F = f ^ (((g & h & j) | (f & h & j) | ((h ^ j) & ~(c | d | e | i)))
-                 ^ ((f & g & j) | ~(f | g | h) | (~f & ~g & h & j)));
-    assign G = g ^ (((f & g & j) | ~(f | g | h) | (~f & ~g & h & j))
-                 ^ ((~f & ~h & ~j) | ((h ^ j) & ~(c | d | e | i)) | (~g & ~h & ~j)));
-    assign H = h ^ (((f & g & j) | ~(f | g | h) | (~f & ~g & h & j))
-                 ^ ((~g & ~h & ~j) | (f & h & j) | ((h ^ j) & ~(c | d | e | i))));
-    assign K = ((c & d & e & i) | (~c & ~d & ~e & ~i)) ^
-               (~e & i & g & h & j & P13) ^
-               (e & ~i & ~g & ~h & ~j & P31);  
-                 
+    always @(posedge clk)
+    begin
+        F = f ^ (((g & h & j) | (f & h & j) | ((h ^ j) & ~(c | d | e | i)))
+              ^ ((f & g & j) | ~(f | g | h) | (~f & ~g & h & j)));
+        G = g ^ (((f & g & j) | ~(f | g | h) | (~f & ~g & h & j))
+              ^ ((~f & ~h & ~j) | ((h ^ j) & ~(c | d | e | i)) | (~g & ~h & ~j)));
+        H = h ^ (((f & g & j) | ~(f | g | h) | (~f & ~g & h & j))
+              ^ ((~g & ~h & ~j) | (f & h & j) | ((h ^ j) & ~(c | d | e | i))));
+        K = ((c & d & e & i) | (~c & ~d & ~e & ~i)) ^
+            (~e & i & g & h & j & P13) ^ (e & ~i & ~g & ~h & ~j & P31);  
+    end
+    
     assign KHGF = {K, H, G, F};
 endmodule
-
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -184,8 +187,8 @@ module disCtrl(
     input rd_in,
     input [2:0] P,
     output [3:0] D,
-    output rd_out,
-    output rd_error
+    output reg rd_out,
+    output reg rd_error
     );
     
     wire a, b, c, d, e, i, f, g, h, j;
@@ -214,18 +217,26 @@ module disCtrl(
                    (~f & ~g & ~h) | (~g & ~h & ~j) ;
     assign RD4 = (PD0S4 | ND0S4);
     /* Disparity checking for error */
-    assign rd_error = (rd_in & PD0S6)       |   // rd_in is +, but dis of 6B/5B is +2
-                      (~rd_in & ND0S6)      |   // rd_in is -, but dis of 6B/5B is -2
-                      (rd_in_s4 & PD0S4)    |   // rd_in_s4 is +, but dis of 4B/3B is +2
-                      (~rd_in_s4 & ND0S4)   ;   // rd_in_s4 is -, but dis of 4B/3B is -2      
+    always @(posedge clk) 
+    begin
+        if (reset) rd_error = 0;
+        else
+        rd_error <= (rd_in & PD0S6)       |   // rd_in is +, but dis of 6B/5B is +2
+                    (~rd_in & ND0S6)      |   // rd_in is -, but dis of 6B/5B is -2
+                    (rd_in_s4 & PD0S4)    |   // rd_in_s4 is +, but dis of 4B/3B is +2
+                    (~rd_in_s4 & ND0S4)   ;   // rd_in_s4 is -, but dis of 4B/3B is -2   
+    end
     /* Running disparity of the end */
     wire rd_cur;
     assign rd_cur = RD6 ^ RD4;          // Running disparity of current input
-    assign rd_out = rd_cur ^ rd_in;     // Use running disparity of current input to determine if we
+    always @(posedge clk) 
+    begin
+        if (reset) rd_out = 0;
+        else rd_out <= rd_cur ^ rd_in;  // Use running disparity of current input to determine if we
                                         //  need to change entry running disparity of the next input.
+    end
     assign D = {PD0S6, ND0S6, PD0S4, ND0S4};
 endmodule
-
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -266,39 +277,36 @@ module inCheck(
     assign {P13, P22, P31} = P;
     assign {PD0S6, ND0S6, PD0S4, ND0S4} = D;
     
-    assign in_error = // These cover all +6, +4 disparity cases in 6B/5B
-                      (a & b & c & d)                                   | 
-                      (~a & ~b & ~c & ~d)                               | 
-                      (P13 & ~e & ~i)                                   |  
-                      (P31 & e & i)                                     | 
-                      // These cover all +4 disparity cases in 4B/3B
-                      (f & g & h & j)                                   | 
-                      (~f & ~g & ~h & ~j)                               | 
-                      // These cover all cases of run-length 6 (D.7 and D.x.3)
-                      (a & b & c & ~d & ~e & ~i & ND0S4)                |
-                      (~a & ~b & ~c & d & e & i & PD0S4)                |
-                      (f & g & ~h & ~j & PD0S6)                         |
-                      (~f & ~g & h & j & ND0S6)                         |
-                      // These cover all cases of run-length 5
-                      (e & i & f & g & h)                               | 
-                      (~e & ~i & ~f & ~g & ~h)                          | 
-                      (d & e & i & f & g)                               |
-                      (~d & ~e & ~i & ~f & ~g)                          |  
-                      // These cover all anti-case of run-length 5
-                      (i & ~e & ~g & ~h & ~j)                           | 
-                      (~i & e & g & h & j)                              | 
-                      // These are the 2 samples that are not covered by equations
-                      (~a & ~b & c & d & e & i & ~f & ~g & ~h & j)      |
-                      (a & b & ~c & ~d & ~e & ~i & f & g & h & ~j)      |
-                      // Do not know why but it is what it is 
-                      ((e & i & ~g & ~h & ~j) & ((c ^ d) | (d ^ e)))    |   
-                      ((~e & ~i & g & h & j) & ((c ^ d) | (d ^ e)))     |
-                      (~P31 & e & ~i & ~g & ~h & ~j)                    |
-                      (~P13 & ~e & i & g & h & j)                       |
-                      // These cover all cases +4 or -4 total disparity
-                      (PD0S6 & PD0S4) | (ND0S6 & ND0S4) ;
+    // All invalid input cases
+    reg case1, case2, case3, case4, case5, case6, case7, case8, case9; 
+    always @(posedge clk) 
+    begin
+        // These cover all +6, +4 disparity cases in 6B/5B
+        case1 = (a & b & c & d) | (~a & ~b & ~c & ~d) | (P13 & ~e & ~i) | (P31 & e & i);
+        // These cover all +4 disparity cases in 4B/3B
+        case2 = (f & g & h & j) | (~f & ~g & ~h & ~j);
+        // These cover all cases of run-length 6 (D.7)
+        case3 = (a & b & c & ~d & ~e & ~i & ND0S4) | (~a & ~b & ~c & d & e & i & PD0S4);
+        // These cover all cases of run-length 6 (D.x.3)
+        case4 = (f & g & ~h & ~j & PD0S6) | (~f & ~g & h & j & ND0S6);
+        // These cover all cases of run-length 5
+        case5 = (e & i & f & g & h) | (~e & ~i & ~f & ~g & ~h) | 
+                (d & e & i & f & g) | (~d & ~e & ~i & ~f & ~g) ;
+        // These cover all anti-case of run-length 5
+        case6 = (i & ~e & ~g & ~h & ~j) | (~i & e & g & h & j);
+        // These are the 2 samples that are not covered by equations
+        case7 = (~a & ~b & c & d & e & i & ~f & ~g & ~h & j) |
+                (a & b & ~c & ~d & ~e & ~i & f & g & h & ~j) ;
+        // Do not know why but it is what it is 
+        case8 = ((e & i & ~g & ~h & ~j) & ((c ^ d) | (d ^ e))) |
+                ((~e & ~i & g & h & j) & ((c ^ d) | (d ^ e))) |
+                (~P31 & e & ~i & ~g & ~h & ~j) | (~P13 & ~e & i & g & h & j) ;
+        // These cover all cases +4 or -4 total disparity
+        case9 = (PD0S6 & PD0S4) | (ND0S6 & ND0S4) ;
+    end
+    
+    assign in_error = case1 | case2 | case3 | case4 | case5 
+                    | case6 | case7 | case8 | case9;
 endmodule   
-
-
 
 
