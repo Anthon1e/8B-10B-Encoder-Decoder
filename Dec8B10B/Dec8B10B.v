@@ -42,10 +42,10 @@ module Dec8B10B(
     reg rd_in;
     
     fcn6b   f6b(clk, reset, data_in[9:4], P);
+    inCheck err(clk, reset, data_in, P, D, in_error); 
     fcn6b5b f65(clk, reset, data_in[9:4], P, EDCBA);
     fcn4b3b f43(clk, reset, data_in[7:0], P, KHGF);
     disCtrl dis(clk, reset, data_in, rd_in, P, D, rd_out, rd_error);
-    inCheck err(clk, reset, data_in, P, D, in_error); 
     
     always @(posedge clk)
     begin
