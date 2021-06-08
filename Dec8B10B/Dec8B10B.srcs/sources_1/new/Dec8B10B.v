@@ -45,7 +45,7 @@ module Dec8B10B(
     inCheck err(clk, reset, data_in, P, D, in_error); 
     fcn6b5b f65(clk, reset, data_in[9:4], P, EDCBA);
     fcn4b3b f43(clk, reset, data_in[7:0], P, KHGF);
-    disCtrl dis(clk, reset, data_in, rd_in, P, D, rd_out, rd_error);
+    disCtr2 dis(clk, reset, data_in, rd_in, P, D, rd_out, rd_error);
     
     always @(posedge clk)
     begin
@@ -61,21 +61,21 @@ module Dec8B10B(
     always @(posedge clk)
     begin
         if (reset) begin 
-            out = 8'b0;
-            k_out = 0;
-            disp_err = 0;
-            code_err = 0;
-            rdispout = 0;
+            out <= 8'b0;
+            k_out <= 0;
+            disp_err <= 0;
+            code_err <= 0;
+            rdispout <= 0;
         end else begin 
-            out = {KHGF[2:0], EDCBA};
-            k_out = KHGF[3];
-            rdispout = rd_out;
+            out <= {KHGF[2:0], EDCBA};
+            k_out <= KHGF[3];
+            rdispout <= rd_out;
             // If there is error from input, set 1 to code_err, ignore the result
-            if (in_error)   code_err = 1;
-            else            code_err = 0;
+            if (in_error)   code_err <= 1;
+            else            code_err <= 0;
             // If there is disparity error, set 1 to disp_err, still give out result
-            if (rd_error)   disp_err = 1;
-            else            disp_err = 0;
+            if (rd_error)   disp_err <= 1;
+            else            disp_err <= 0;
         end
     end
 endmodule
